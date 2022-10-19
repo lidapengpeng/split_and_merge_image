@@ -18,7 +18,6 @@ def split_one_image(one_image_path, out_split_image_path, width=416, height=416,
     mandatory = False
     img = cv2.imread(one_image_path)
 
-    print(img.shape)
     # original image size
     original_height = img.shape[0]
     original_width = img.shape[1]
@@ -30,9 +29,6 @@ def split_one_image(one_image_path, out_split_image_path, width=416, height=416,
     max_row = math.ceil(max_row) if mandatory is False else math.floor(max_row)
     max_col = math.ceil(max_col) if mandatory is False else math.floor(max_col)
 
-    print(max_row)
-    print(max_col)
-
     images = []
     for i in range(max_row):
         images_temp = []
@@ -40,36 +36,36 @@ def split_one_image(one_image_path, out_split_image_path, width=416, height=416,
             temp_out_path = str(out_split_image_path)+'/'+img_file_name
             if not os.path.exists(temp_out_path):
                 os.makedirs(temp_out_path)
-            temp_path = temp_out_path + '/' + str(i) + '_' + str(j) + '_'
+            temp_path = temp_out_path + '/' + img_file_name + '_' + str(i).zfill(2) + '_' + str(j).zfill(2)
             if ((width + j * w_val) > original_width and (
                     i * h_val + height) <= original_height):  # Judge the right most incomplete part
                 temp = img[i * h_val:i * h_val + height, j * w_val:original_width, :]
-                temp_path = temp_path + str(temp.shape[0]) + '_' + str(temp.shape[1]) + '.jpg'
+                temp_path = temp_path + '_' + str(temp.shape[0]) + '_' + str(temp.shape[1]) + '.jpg'
                 cv2.imwrite(temp_path, temp)
                 images_temp.append(temp)
             elif ((height + i * h_val) > original_height and (
                     j * w_val + width) <= original_width):  # Judge the incomplete part at the bottom
                 temp = img[i * h_val:original_height, j * w_val:j * w_val + width, :]
-                temp_path = temp_path + str(temp.shape[0]) + '_' + str(temp.shape[1]) + '.jpg'
+                temp_path = temp_path + '_' + str(temp.shape[0]) + '_' + str(temp.shape[1]) + '.jpg'
                 cv2.imwrite(temp_path, temp)
                 images_temp.append(temp)
             elif (width + j * w_val) > original_width and (
                     i * h_val + height) > original_height:  # Judge the last slide
                 temp = img[i * h_val:original_height, j * w_val:original_width, :]
-                temp_path = temp_path + str(temp.shape[0]) + '_' + str(temp.shape[1]) + '.jpg'
+                temp_path = temp_path + '_' + str(temp.shape[0]) + '_' + str(temp.shape[1]) + '.jpg'
                 cv2.imwrite(temp_path, temp)
                 images_temp.append(temp)
             else:
                 temp = img[i * h_val:i * h_val + height, j * w_val:j * w_val + width, :]
-                temp_path = temp_path + str(temp.shape[0]) + '_' + str(temp.shape[1]) + '.jpg'
+                temp_path = temp_path + '_' + str(temp.shape[0]) + '_' + str(temp.shape[1]) + '.jpg'
                 cv2.imwrite(temp_path, temp)
                 images_temp.append(temp)
         images.append(images_temp)
 
-    print(len(images))
-
 
 if __name__ == '__main__':
+    if not os.path.exists('./split_image/'):
+        os.makedirs('./split_image/')
     out_path = Path('./split_image/')
     source_images_path = Path('./source_image/').glob('*.JPG')
     images_path = [str(path) for path in source_images_path]
